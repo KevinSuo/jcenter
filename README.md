@@ -1,6 +1,6 @@
 # 发布Android Library到jCenter
 步骤如下：
-### bintray/jcenter 部分
+## bintray/jcenter 部分
 1. 到 https://bintray.com/signup/oss 注册个人账号
 
 2. 在 bintray 创建 maven 资源库
@@ -11,7 +11,7 @@
 
 3. 使用gpg生成密钥
 >  gpg --gen-key
-### Android Studio部分
+## Android Studio部分
 1. 在根目录下的build.gradle文件添加如下代码
 ```
 dependencies {
@@ -49,7 +49,7 @@ if(rootProject.file('local.properties').exists()) {
 
 ```
 
-### 发布
+## 发布
 ```
 ./gradlew install 
 ./gradlew bintrayUpload
