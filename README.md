@@ -16,7 +16,7 @@
 ```
 dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 ```
 2. 在根目录下的local.properties文件添加如下代码
