@@ -57,4 +57,4 @@ if(rootProject.file('local.properties').exists()) {
 ```
 
 > 需要注意的是 这样只是发库发布到了 bintray上，并没有同步到jcenter,发布成功后需要到bintray上找到发布的库，并在同一页找到“ADD to JCenter"点击后发送同步申请，
-> 内容可为空
+> 内容可为空；同步到JCenter需要审核，大概需要两到三个钟头，审核通过后即可在工程中引用该库
