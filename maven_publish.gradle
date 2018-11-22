@@ -1,0 +1,43 @@
+apply plugin: 'maven-publish'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+afterEvaluate { project ->
+  tasks.all { Task task ->
+    if (task.name.equalsIgnoreCase('generatePomFileForMyPublicationPublication')) {
+      task.dependsOn tasks.getByName('assembleRelease')
+    }
+  }
+}
+
+publishing {
+  publications {
+    myPublication(MavenPublication) {
+      groupId GROUPID
+      artifactId ARTIFACTID
+      version VERSION
+      artifact "$buildDir/outputs/aar/${project.getName()}-release.aar"
+    }
+  }
+
+  repositories {
+    maven {
+      url properties.getProperty("maven.repo_url")
+      credentials {
+        username properties.getProperty("maven.credentials.username")
+        password properties.getProperty("maven.credentials.access_token")
+      }
+    }
+  }
+}
+
+repositories {
+  maven {
+    url properties.getProperty("maven.repo_url")
+    credentials {
+      username properties.getProperty("maven.credentials.username")
+      password properties.getProperty("maven.credentials.access_token")
+    }
+  }
+}
