@@ -1,11 +1,11 @@
 apply plugin: 'maven-publish'
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
 
 afterEvaluate { project ->
   tasks.all { Task task ->
-    if (task.name.equalsIgnoreCase('generatePomFileForMyPublicationPublication')) {
+    if (task.name.equalsIgnoreCase('generatePomFileForMavenLibraryPublication')) {
       task.dependsOn tasks.getByName('assembleRelease')
     }
   }
@@ -13,7 +13,7 @@ afterEvaluate { project ->
 
 publishing {
   publications {
-    myPublication(MavenPublication) {
+    mavenLibrary(MavenPublication) {
       groupId GROUPID
       artifactId ARTIFACTID
       version VERSION
@@ -28,16 +28,6 @@ publishing {
         username properties.getProperty("maven.credentials.username")
         password properties.getProperty("maven.credentials.access_token")
       }
-    }
-  }
-}
-
-repositories {
-  maven {
-    url properties.getProperty("maven.repo_url")
-    credentials {
-      username properties.getProperty("maven.credentials.username")
-      password properties.getProperty("maven.credentials.access_token")
     }
   }
 }
