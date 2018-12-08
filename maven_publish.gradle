@@ -10,6 +10,11 @@ afterEvaluate { project ->
     }
   }
 }
+// 打包源码
+task sourseJar(type:Jar) {
+  classifier = 'sources'
+  from android.sourceSets.main.java.srcDirs
+}
 
 publishing {
   publications {
@@ -18,6 +23,7 @@ publishing {
       artifactId ARTIFACTID
       version VERSION
       artifact "$buildDir/outputs/aar/${project.getName()}-release.aar"
+      artifact sourseJar
     }
   }
 
