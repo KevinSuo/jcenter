@@ -1,8 +1,14 @@
 apply plugin: 'maven-publish'
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
+def isAndroid = plugins.hasPlugin('com.android.library')
 
+ext {
+  maven_repo_release = "http://[IP地址]/repository/maven-releases/"
+  maven_repo_snapshot = "http://[IP地址]/repository/maven-snapshots/"
+  maven_name = "UserName"
+  maven_token = "Token"
+  isReleaseVersion = !(VERSION =~ /-SNAPSHOT$/)
+}
 afterEvaluate { project ->
   tasks.all { Task task ->
     if (task.name.equalsIgnoreCase('generatePomFileForMavenLibraryPublication')) {
@@ -10,10 +16,14 @@ afterEvaluate { project ->
     }
   }
 }
-// 打包源码
-task sourseJar(type:Jar) {
+// 打包源代码
+task sourseJar(type: Jar) {
   classifier = 'sources'
-  from android.sourceSets.main.java.srcDirs
+  if (isAndroid) {
+    from android.sourceSets.main.java.srcDirs
+  } else {
+    from sourceSets.main.allSource
+  }
 }
 
 publishing {
@@ -22,18 +32,43 @@ publishing {
       groupId GROUPID
       artifactId ARTIFACTID
       version VERSION
-      artifact "$buildDir/outputs/aar/${project.getName()}-release.aar"
+
+      if (isAndroid) {
+        artifact "$buildDir/outputs/aar/${project.getName()}-release.aar"
+      } else {
+        from components.java
+      }
       artifact sourseJar
+      
+      // 添加依赖项，加入该模块依赖的第三方库
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+        configurations.implementation.allDependencies.withType(ModuleDependency) {ModuleDependency dp ->
+          def dependencyNode = dependenciesNode.appendNode('dependency')
+          dependencyNode.appendNode('groupId', dp.group)
+          dependencyNode.appendNode('artifactId', dp.name)
+          dependencyNode.appendNode('version', dp.version)
+          if (dp.excludeRules.size() > 0) {
+            def exclusions = dependencyNode.appendNode('exclusions')
+            dp.excludeRules.each { ExcludeRule ex ->
+              def exclusion = exclusions.appendNode('exclusion')
+              exclusion.appendNode('groupId', ex.group)
+              exclusion.appendNode('artifactId', ex.module)
+            }
+          }
+        }
+      }
     }
   }
 
   repositories {
     maven {
-      url properties.getProperty("maven.repo_url")
+      url isReleaseVersion ? maven_repo_release : maven_repo_snapshot
       credentials {
-        username properties.getProperty("maven.credentials.username")
-        password properties.getProperty("maven.credentials.access_token")
+        username maven_name
+        password maven_token
       }
     }
   }
 }
+
